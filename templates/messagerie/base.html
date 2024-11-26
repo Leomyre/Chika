@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Messagerie{% endblock %}</title>
+    {% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-1/4 bg-white border-r">
+            <div class="p-4">
+                <h1 class="text-2xl font-bold text-blue-600">Messagerie</h1>
+            </div>
+            <nav>
+                <ul class="space-y-2">
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'inbox' %}" class="block px-4 py-2 hover:bg-gray-100">Messages</a></li>
+                        <li><a href="{% url 'logout' %}" class="block px-4 py-2 hover:bg-gray-100">Se déconnecter</a></li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}" class="block px-4 py-2 hover:bg-gray-100">Se connecter</a></li>
+                        <li><a href="{% url 'signup' %}" class="block px-4 py-2 hover:bg-gray-100">S'inscrire</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Main content -->
+        <div class="flex-1 flex flex-col">
+            <div class="bg-white shadow">
+                <div class="container mx-auto px-4 py-2 flex justify-between items-center">
+                    {% block header %}{% endblock %}
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

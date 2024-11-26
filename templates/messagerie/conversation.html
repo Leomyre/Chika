@@ -1,0 +1,38 @@
+{% extends 'messagerie/base.html' %}
+
+{% block title %}Conversation avec {{ receiver.username }}{% endblock %}
+
+{% block header %}
+<div class="flex justify-between items-center">
+    <h2 class="text-xl font-semibold">{{ receiver.username }}</h2>
+    <a href="{% url 'inbox' %}" class="text-blue-500 hover:underline">Retour</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col h-full">
+    <div class="flex-1 overflow-y-auto mb-4">
+        <ul class="space-y-2">
+            {% for message in messages|dictsortreversed:"timestamp" %}
+                <li class="flex {% if message.sender == request.user.username %}justify-end{% endif %}">
+                    <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg {% if message.sender == request.user.username %}bg-blue-500 text-white{% else %}bg-gray-200 text-gray-800{% endif %}">
+                        <p class="text-sm">{{ message.content|safe }}</p>
+                    </div>
+                </li>
+            {% empty %}
+                <li class="text-center text-gray-500">Aucun message dans cette conversation.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="mt-auto">
+        <form method="POST" class="flex items-center">
+            {% csrf_token %}
+            <textarea name="message" placeholder="Votre message" required class="flex-1 border rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Envoyer</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
+

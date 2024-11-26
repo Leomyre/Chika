@@ -1,0 +1,22 @@
+# Ignorer le dossier logs
+logs/
+
+# Ignorer tous les dossiers venv
+venv/
+
+__pycache__
+
+# Ignorer les fichiers temporaires ou système
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Ignorer les fichiers de configuration d'éditeur
+.vscode/
+.idea/
+
+# Ignorer les fichiers de compilation
+dist/
+build/
+venv
