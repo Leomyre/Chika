@@ -7,13 +7,35 @@
     {% load static %}
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        .dark {
+            background-color: #1a202c;
+            color: #fff;
+        }
+        .dark .bg-white {
+            background-color: #2d3748;
+        }
+        .dark .text-gray-600 {
+            color: #cbd5e0;
+        }
+        .dark .border-gray-200 {
+            border-color: #4a5568;
+        }
+        .dark .hover\:bg-gray-100:hover {
+            background-color: #4a5568;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 transition-colors duration-200">
     <div class="flex h-screen">
         <!-- Sidebar -->
-        <div class="w-1/4 bg-white border-r">
-            <div class="p-4">
+        <div class="w-1/4 bg-white border-r border-gray-200 transition-colors duration-200">
+            <div class="p-4 flex justify-between items-center">
                 <h1 class="text-2xl font-bold text-blue-600">Messagerie</h1>
+                <button id="themeToggle" class="p-2 rounded-full bg-gray-200 text-gray-800">
+                    <i data-feather="sun"></i>
+                </button>
             </div>
             <nav>
                 <ul class="space-y-2">
@@ -30,7 +52,7 @@
 
         <!-- Main content -->
         <div class="flex-1 flex flex-col">
-            <div class="bg-white shadow">
+            <div class="bg-white shadow transition-colors duration-200">
                 <div class="container mx-auto px-4 py-2 flex justify-between items-center">
                     {% block header %}{% endblock %}
                 </div>
@@ -40,6 +62,29 @@
             </div>
         </div>
     </div>
+
+    <script>
+        feather.replace();
+
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        const sunIcon = `<i data-feather="sun"></i>`;
+        const moonIcon = `<i data-feather="moon"></i>`;
+
+        function setTheme(isDark) {
+            html.classList.toggle('dark', isDark);
+            themeToggle.innerHTML = isDark ? sunIcon : moonIcon;
+            localStorage.setItem('darkMode', isDark);
+            feather.replace();
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = !html.classList.contains('dark');
+            setTheme(isDark);
+        });
+
+        // Set initial theme
+        setTheme(localStorage.getItem('darkMode') === 'true');
+    </script>
 </body>
 </html>
-

@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+<div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md overflow-hidden transition-colors duration-200">
     <div class="px-6 py-4">
         <form method="post" class="space-y-4">
             {% csrf_token %}
@@ -36,4 +36,3 @@
     <a href="{% url 'inbox' %}" class="text-blue-600 hover:text-blue-800">Retour à la boîte de réception</a>
 </div>
 {% endblock %}
-

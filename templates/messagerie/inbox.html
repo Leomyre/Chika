@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="bg-white rounded-lg shadow">
+<div class="bg-white rounded-lg shadow transition-colors duration-200">
     <h3 class="text-lg font-semibold p-4 border-b">Conversations</h3>
     <ul class="divide-y divide-gray-200">
         {% for user in users %}
@@ -36,4 +36,3 @@
     </ul>
 </div>
 {% endblock %}
-
