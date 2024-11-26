@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-@ao%wx&+t-k$zsjc$4&*ofju9yzv=l$od6be1wime=_7s%fc)0
 DEBUG = True
 
 #ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['https://chika-gjfv.onrender.com']
+ALLOWED_HOSTS = ['chika-gjfv.onrender.com']
 
 
 LOGIN_URL = 'login'
