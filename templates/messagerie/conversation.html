@@ -4,18 +4,18 @@
 
 {% block header %}
 <div class="flex justify-between items-center">
-    <h2 class="text-xl font-semibold">{{ receiver.username }}</h2>
+    <h2 class="text-lg sm:text-xl font-semibold">{{ receiver.username }}</h2>
     <a href="{% url 'inbox' %}" class="text-blue-500 hover:underline">Retour</a>
 </div>
 {% endblock %}
 
 {% block content %}
 <div class="flex flex-col h-full bg-gray-100 transition-colors duration-200">
-    <div class="flex-1 overflow-y-auto mb-4 p-4">
+    <div class="flex-1 overflow-y-auto mb-4 p-2 sm:p-4">
         <ul class="space-y-2">
             {% for message in messages|dictsortreversed:"timestamp" %}
                 <li class="flex {% if message.sender == request.user.username %}justify-end{% endif %}">
-                    <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg {% if message.sender == request.user.username %}bg-blue-500 text-white{% else %}bg-white text-gray-800{% endif %} transition-colors duration-200">
+                    <div class="max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg px-3 py-2 rounded-lg {% if message.sender == request.user.username %}bg-blue-500 text-white{% else %}bg-white text-gray-800{% endif %} transition-colors duration-200">
                         <p class="text-sm">{{ message.content|safe }}</p>
                     </div>
                 </li>
@@ -25,7 +25,7 @@
         </ul>
     </div>
 
-    <div class="bg-white p-4 border-t border-gray-200 transition-colors duration-200">
+    <div class="bg-white p-2 sm:p-4 border-t border-gray-200 transition-colors duration-200">
         <form method="POST" class="flex items-center">
             {% csrf_token %}
             <textarea name="message" placeholder="Votre message" required class="flex-1 border rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
