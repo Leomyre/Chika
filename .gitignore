@@ -22,3 +22,4 @@ Thumbs.db
 dist/
 build/
 venv
+db.sqlite3
