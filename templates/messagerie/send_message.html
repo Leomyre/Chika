@@ -15,10 +15,16 @@
                 <label for="receiver" class="block text-sm font-medium text-gray-700">Envoyer à :</label>
                 <select name="receiver" id="receiver" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
                     {% for user in users %}
-                        <option value="{{ user.id }}">{{ user.username }}</option>
+                        <option value="{{ user.id }}">
+                            {% if user.profile.photo %}
+                                <img src="{{ user.profile.photo.url }}" alt="{{ user.username }}" class="inline-block h-6 w-6 rounded-full">
+                            {% endif %}
+                            {{ user.username }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
+            
             <div>
                 <label for="message" class="block text-sm font-medium text-gray-700">Message :</label>
                 <textarea name="message" id="message" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" placeholder="Écrivez votre message ici..."></textarea>

@@ -3,36 +3,82 @@
 {% block title %}Boîte de Réception{% endblock %}
 
 {% block header %}
-<h2 class="text-lg sm:text-xl font-semibold">Vos Messages</h2>
+<h2 class="text-lg sm:text-xl font-semibold text-gray-700">Vos Messages</h2>
 {% endblock %}
 
 {% block content %}
-<div class="bg-white rounded-lg shadow transition-colors duration-200">
-    <h3 class="text-lg font-semibold p-4 border-b">Conversations</h3>
+<div class="flex justify-between items-center mb-4">
+    <h3 class="text-lg font-semibold text-gray-700">Conversations</h3>
+    <a href="{% url 'send_message' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        Nouvelle conversation
+    </a>
+</div>
+
+<div class="bg-white rounded-lg shadow">
     <ul class="divide-y divide-gray-200">
         {% for user in users %}
-            <li>
-                <a href="{% url 'conversation' user.id %}" class="block hover:bg-gray-50 transition duration-150 ease-in-out">
-                    <div class="flex items-center px-4 py-4 sm:px-6">
-                        <div class="min-w-0 flex-1 flex items-center">
-                            <div class="flex-shrink-0">
-                                <img class="h-10 w-10 sm:h-12 sm:w-12 rounded-full" src="https://ui-avatars.com/api/?name={{ user.username }}&background=random" alt="{{ user.username }}">
-                            </div>
-                            <div class="min-w-0 flex-1 px-4">
-                                <div>
-                                    <p class="text-sm font-medium text-indigo-600 truncate">{{ user.username }}</p>
-                                    <p class="mt-1 flex items-center text-xs sm:text-sm text-gray-500">
-                                        <span class="truncate">{{ user.last_message|truncatechars:50 }}</span>
-                                    </p>
-                                </div>
-                            </div>
+            <li class="flex justify-between items-center py-4 px-4 relative">
+                <a href="{% url 'conversation' user.id %}" class="block hover:bg-gray-50 flex-1">
+                    <div class="flex items-center">
+                        {% if user.profile.photo %}
+                            <img class="h-10 w-10 rounded-full" src="{{ user.profile.photo.url }}" alt="{{ user.username }}">
+                        {% else %}
+                            <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name={{ user.username }}&background=random" alt="{{ user.username }}">
+                        {% endif %}
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-indigo-600">{{ user.username }}</p>
                         </div>
                     </div>
                 </a>
+
+                <!-- Bouton pour afficher les actions (3 points) -->
+                <button class="text-gray-500 hover:text-gray-700 focus:outline-none relative" onclick="toggleActionMenu('{{ user.id }}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <circle cx="12" cy="12" r="1" />
+                        <circle cx="12" cy="5" r="1" />
+                        <circle cx="12" cy="19" r="1" />
+                    </svg>
+                </button>
+
+                <!-- Menu contextuel (actions) -->
+                <div class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10" id="action-menu-{{ user.id }}">
+                    <button onclick="deleteConversation('{{ user.id }}')" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Supprimer la conversation</button>
+                </div>
             </li>
         {% empty %}
-            <li class="px-4 py-4 sm:px-6 text-gray-500">Aucun utilisateur disponible.</li>
+            <li class="text-center text-gray-500 py-4">Aucune conversation.</li>
         {% endfor %}
     </ul>
 </div>
+
+<script>
+    function toggleActionMenu(userId) {
+        const menu = document.getElementById(`action-menu-${userId}`);
+        const allMenus = document.querySelectorAll('[id^="action-menu-"]');
+        
+        // Hide all other menus
+        allMenus.forEach(m => {
+            if (m.id !== `action-menu-${userId}`) {
+                m.classList.add('hidden');
+            }
+        });
+        
+        // Toggle visibility of the clicked menu
+        menu.classList.toggle('hidden');
+    }
+
+    function deleteConversation(userId) {
+        if (confirm("Voulez-vous vraiment supprimer cette conversation ?")) {
+            window.location.href = `/conversation/delete/${userId}/`;
+        }
+    }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!event.target.closest('button')) {
+            const allMenus = document.querySelectorAll('[id^="action-menu-"]');
+            allMenus.forEach(menu => menu.classList.add('hidden'));
+        }
+    });
+</script>
 {% endblock %}

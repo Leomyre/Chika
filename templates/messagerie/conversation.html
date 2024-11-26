@@ -4,19 +4,76 @@
 
 {% block header %}
 <div class="flex justify-between items-center">
-    <h2 class="text-lg sm:text-xl font-semibold">{{ receiver.username }}</h2>
-    <a href="{% url 'inbox' %}" class="text-blue-500 hover:underline">Retour</a>
+    <div class="flex items-center">
+        {% if receiver.profile.photo %}
+            <img src="{{ receiver.profile.photo.url }}" alt="{{ receiver.username }}" class="h-10 w-10 rounded-full mr-3">
+        {% else %}
+            <img src="https://ui-avatars.com/api/?name={{ receiver.username }}&background=random" alt="{{ receiver.username }}" class="h-10 w-10 rounded-full mr-3">
+        {% endif %}
+        <h2 class="text-lg sm:text-xl font-semibold text-gray-700">{{ receiver.username }}</h2>
+    </div>
+    <a href="{% url 'inbox' %}" class="text-blue-500 hover:underline">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+    </a>
 </div>
 {% endblock %}
 
 {% block content %}
 <div class="flex flex-col h-full bg-gray-100 transition-colors duration-200">
-    <div class="flex-1 overflow-y-auto mb-4 p-2 sm:p-4">
-        <ul class="space-y-2">
-            {% for message in messages|dictsortreversed:"timestamp" %}
-                <li class="flex {% if message.sender == request.user.username %}justify-end{% endif %}">
-                    <div class="max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg px-3 py-2 rounded-lg {% if message.sender == request.user.username %}bg-blue-500 text-white{% else %}bg-white text-gray-800{% endif %} transition-colors duration-200">
-                        <p class="text-sm">{{ message.content|safe }}</p>
+    <div class="flex-1 overflow-y-auto mb-4 p-4">
+        <ul class="space-y-4">
+            {% for message in messages %}
+                <li class="flex {% if message.sender == request.user.username %}justify-end{% else %}justify-start{% endif %}">
+                    <div class="flex items-start">
+                        <!-- Pour l'expéditeur (l'utilisateur connecté), afficher le bouton (3 points) avant le message et la photo après -->
+                        {% if message.sender == request.user.username %}
+                            <!-- Bouton 3 points avant le message -->
+                            <button class="text-gray-500 hover:text-gray-700 focus:outline-none ml-2" onclick="showMessageActionsMenu(event, '{{ message.id }}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                </svg>
+                            </button>
+                            
+                            <!-- Contenu du message -->
+                            <div class="max-w-xs sm:max-w-md lg:max-w-lg xl:max-w-xl px-4 py-2 rounded-lg {% if message.sender == request.user.username %}bg-blue-500 text-white{% else %}bg-white text-gray-800{% endif %} shadow">
+                                <p class="text-sm">{{ message.content }}</p>
+                                <p class="text-xs {% if message.sender == request.user.username %}text-blue-100{% else %}text-gray-500{% endif %} mt-1">{{ message.timestamp|date:"H:i" }}</p>
+                            </div>
+
+                            <!-- Photo de l'expéditeur après le message -->
+                            <div class="ml-3">
+                                {% if request.user.profile.photo %}
+                                    <img src="{{ request.user.profile.photo.url }}" alt="{{ request.user.username }}" class="h-10 w-10 rounded-full">
+                                {% else %}
+                                    <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=random" alt="{{ request.user.username }}" class="h-10 w-10 rounded-full">
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <!-- Pour le destinataire, afficher la photo avant le message et le bouton (3 points) après -->
+                            <!-- Photo du destinataire avant le message -->
+                            <div class="mr-3">
+                                {% if receiver.profile.photo %}
+                                    <img src="{{ receiver.profile.photo.url }}" alt="{{ receiver.username }}" class="h-10 w-10 rounded-full">
+                                {% else %}
+                                    <img src="https://ui-avatars.com/api/?name={{ receiver.username }}&background=random" alt="{{ receiver.username }}" class="h-10 w-10 rounded-full">
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Contenu du message -->
+                            <div class="max-w-xs sm:max-w-md lg:max-w-lg xl:max-w-xl px-4 py-2 rounded-lg {% if message.sender == request.user.username %}bg-blue-500 text-white{% else %}bg-white text-gray-800{% endif %} shadow">
+                                <p class="text-sm">{{ message.content }}</p>
+                                <p class="text-xs {% if message.sender == request.user.username %}text-blue-100{% else %}text-gray-500{% endif %} mt-1">{{ message.timestamp|date:"H:i" }}</p>
+                            </div>
+
+                            <!-- Bouton 3 points après le message -->
+                            <button class="text-gray-500 hover:text-gray-700 focus:outline-none ml-2" onclick="showMessageActionsMenu(event, '{{ message.id }}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                </svg>
+                            </button>
+                        {% endif %}
                     </div>
                 </li>
             {% empty %}
@@ -25,12 +82,53 @@
         </ul>
     </div>
 
-    <div class="bg-white p-2 sm:p-4 border-t border-gray-200 transition-colors duration-200">
+    <div class="bg-white p-4 border-t border-gray-200 transition-colors duration-200">
         <form method="POST" class="flex items-center">
             {% csrf_token %}
-            <textarea name="message" placeholder="Votre message" required class="flex-1 border rounded-l-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">Envoyer</button>
+            <textarea name="message" placeholder="Écrivez un message..." required class="flex-1 border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+            <button type="submit" class="ml-2 bg-blue-500 text-white rounded-full p-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+            </button>
         </form>
     </div>
 </div>
+
+<div id="message-actions-menu" class="hidden fixed bg-white shadow-lg rounded-lg p-2 z-50">
+    <button onclick="deleteMessage()" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded">Supprimer</button>
+    <button onclick="replyToMessage()" class="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-gray-100 rounded">Répondre</button>
+</div>
+
+<script>
+    let currentMessageId = null;
+
+    function showMessageActionsMenu(event, messageId) {
+        event.stopPropagation();
+        const menu = document.getElementById('message-actions-menu');
+        menu.style.display = 'block';
+        menu.style.left = `${event.clientX}px`;
+        menu.style.top = `${event.clientY}px`;
+        currentMessageId = messageId;
+    }
+
+    function deleteMessage() {
+        if (confirm("Voulez-vous vraiment supprimer ce message ?")) {
+            window.location.href = `/message/delete/${currentMessageId}/`;
+        }
+    }
+
+    function replyToMessage() {
+        const textarea = document.querySelector('textarea[name="message"]');
+        textarea.value = `Réponse au message ${currentMessageId}: `;
+        textarea.focus();
+    }
+
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('message-actions-menu');
+        if (!menu.contains(event.target) && !event.target.closest('button')) {
+            menu.style.display = 'none';
+        }
+    });
+</script>
 {% endblock %}

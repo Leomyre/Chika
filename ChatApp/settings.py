@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -96,12 +97,13 @@ DATABASES = {
         'NAME': 'chika',  # Nom de la base de données
         'USER': 'root',  # Nom d'utilisateur de la base de données
         'PASSWORD': 's9hKq9FpXdecuFY4B4y8qqo4Q2HkRc1b',  # Mot de passe
-        'HOST': 'dpg-ct2ra1btq21c73b6tt1g-a',  # Hôte de la base de données (vérifie dans Render)
+        'HOST': 'dpg-ct2ra1btq21c73b6tt1g-a.oregon-postgres.render.com',  # Hôte de la base de données (vérifie dans Render)
         'PORT': '5432',  # Port par défaut de PostgreSQL
     }
 }
 
-
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
