@@ -8,11 +8,11 @@ from .utils import decrypt_message, encrypt_message
 from django.contrib.auth.forms import UserCreationForm
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.db.models import Q
+from .models import UserProfile
 
-login_required
+@login_required
 def inbox(request):
     # Récupérer les utilisateurs ayant une conversation avec l'utilisateur connecté
     conversations = Message.objects.filter(
@@ -122,17 +122,27 @@ def signup(request):
     return render(request, 'messagerie/signup.html', {'form': form})
 
 
-@login_required
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
+        
+        # Vérifiez d'abord si l'utilisateur existe
         user = authenticate(request, username=username, password=password)
+        
         if user is not None:
-            login(request, user)
-            messages.success(request, 'Vous êtes connecté avec succès.')
-            return redirect('inbox')
+            # Vérifiez si l'utilisateur a un profil
+            if hasattr(user, 'profile'):
+                # Si le profil existe, connectez l'utilisateur
+                login(request, user)
+                messages.success(request, 'Vous êtes connecté avec succès.')
+                return redirect('inbox')
+            else:
+                # Si le profil n'existe pas, affichez un message d'erreur
+                messages.error(request, 'Compte non trouvé. Veuillez compléter votre profil.')
+                return redirect('login')  # Redirige vers la page de connexion
         else:
+            # Si l'utilisateur ou le mot de passe est incorrect
             messages.error(request, 'Nom d’utilisateur ou mot de passe invalide.')
     return render(request, 'messagerie/login.html')
 
@@ -143,13 +153,12 @@ def logout_view(request):
     messages.success(request, 'Vous avez été déconnecté avec succès.')
     return redirect('login')
 
-
 @login_required
 def manage_account(request):
     if request.method == 'POST':
         # Récupérer les données du formulaire
         username = request.POST.get('username')
-        #email = request.POST.get('email')
+        #email = request.POST.get('email')  # Décommentez cette ligne si vous voulez permettre la modification de l'email
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
         photo = request.FILES.get('photo')
@@ -159,23 +168,32 @@ def manage_account(request):
             messages.error(request, "Les mots de passe ne correspondent pas.")
             return redirect('manage_account')
 
-        # Mettre à jour le profil utilisateur
+        # Mettre à jour l'utilisateur
         user = request.user
         if username:
             user.username = username
-        #if email:
+        # Si vous souhaitez permettre la modification de l'email, décommentez et utilisez la ligne ci-dessous :
+        # if email:
         #    user.email = email
+
         if password:
-            user.password = make_password(password)  # Hacher le mot de passe
-            update_session_auth_hash(request, user)  # Empêcher la déconnexion
+            # Hacher le mot de passe avant de le sauvegarder
+            user.password = make_password(password)
+            update_session_auth_hash(request, user)  # Empêcher la déconnexion après changement de mot de passe
+
+        # Gérer la photo de profil
         if photo:
+            # Vérifier si l'utilisateur a un profil, sinon, en créer un
+            if not hasattr(user, 'profile'):
+                UserProfile.objects.create(user=user)
+
             # Sauvegarder la photo de profil
             fs = FileSystemStorage(location='media/profile_photos')
             filename = fs.save(photo.name, photo)
             user.profile.photo = f"profile_photos/{filename}"
 
-        user.save()
+        user.save()  # Sauvegarder l'utilisateur avec les nouvelles informations
         messages.success(request, "Profil mis à jour avec succès.")
-        return redirect('manage_account')
+        return redirect('manage_account')  # Rediriger après la mise à jour
 
     return render(request, 'messagerie/manage_account.html', {'user': request.user})

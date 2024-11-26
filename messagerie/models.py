@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
@@ -24,15 +26,17 @@ class UserProfile(models.Model):
         return self.user.username
     
 
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-
+# Signal pour créer un profil utilisateur si nécessaire
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        UserProfile.objects.create(user=instance)
+        # Si l'utilisateur a été créé et qu'il n'a pas de profil, créez-en un
+        if not hasattr(instance, 'profile'):
+            UserProfile.objects.create(user=instance)
 
+# Signal pour sauvegarder le profil après une mise à jour de l'utilisateur
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
-
+    # Sauvegarde du profil après mise à jour de l'utilisateur
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
