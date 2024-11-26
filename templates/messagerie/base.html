@@ -136,6 +136,7 @@
                     {% if user.is_authenticated %}
                         <li><a href="{% url 'inbox' %}" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Messages</a></li>
                         <li><a href="{% url 'manage_account' %}" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Profil</a></li>
+                        <li><a href="{% url 'about' %}" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">A propos</a></li> <!-- Nouveau lien -->
                         <li><a href="{% url 'logout' %}" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Se déconnecter</a></li>
                     {% else %}
                         <li><a href="{% url 'login' %}" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Se connecter</a></li>

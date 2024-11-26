@@ -1,0 +1,17 @@
+{% extends 'messagerie/base.html' %}
+
+{% block title %}A propos{% endblock %}
+
+{% block header %}
+    <h2 class="text-lg sm:text-xl font-semibold text-gray-700">A propos de l'application</h2>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white rounded-lg shadow p-6 space-y-6">
+    <h3 class="text-xl font-semibold">Description de l'application</h3>
+    <p>{{ app_description }}</p>
+
+    <h3 class="text-xl font-semibold mt-4">Informations de contact</h3>
+    <p>{{ contact_info }}</p>
+</div>
+{% endblock %}

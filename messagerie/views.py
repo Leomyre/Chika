@@ -197,3 +197,29 @@ def manage_account(request):
         return redirect('manage_account')  # Rediriger après la mise à jour
 
     return render(request, 'messagerie/manage_account.html', {'user': request.user})
+
+
+def about(request):
+    # Informations dynamiques ou fixes pour l'application et les informations de contact
+    context = {
+        'app_description': (
+            "Chika est une application de messagerie sécurisée qui vous permet d'échanger des messages cryptés "
+            "de bout en bout. Chaque message envoyé est chiffré avant d'être transmis, garantissant ainsi la "
+            "confidentialité totale de vos conversations.\n\n"
+            "L'application offre une gestion complète de vos messages : vous pouvez facilement supprimer des "
+            "conversations ainsi que les messages qu'elles contiennent. Si vous souhaitez garder votre boîte de "
+            "réception propre et organisée, cette fonctionnalité vous offre une flexibilité maximale.\n\n"
+            "En plus de la messagerie, vous avez la possibilité de gérer votre profil utilisateur. Vous pouvez "
+            "mettre à jour votre pseudo, changer votre mot de passe pour plus de sécurité, et modifier votre photo "
+            "de profil pour personnaliser votre expérience. Chika place l'accent sur la simplicité d'utilisation et "
+            "la sécurité de vos données personnelles.\n\n"
+            "Nous nous engageons à offrir une expérience utilisateur fluide, intuitive et hautement sécurisée."
+        ),
+        'contact_info': (
+            "Si vous avez des questions, des suggestions ou souhaitez simplement nous contacter, vous pouvez nous "
+            "envoyer un email à : ghleomyre@gmail.com\n\n"
+            "Nous serons heureux de recevoir vos retours et d'améliorer constamment l'application pour mieux "
+            "répondre à vos besoins."
+        ),
+    }
+    return render(request, 'messagerie/about.html', context)
