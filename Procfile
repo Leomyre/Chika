@@ -1,1 +1,1 @@
-web: gunicorn ChatApp.wsgi:application
+web: gunicorn Chat.wsgi:application
