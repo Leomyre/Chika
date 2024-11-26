@@ -4,7 +4,9 @@ logs/
 # Ignorer tous les dossiers venv
 venv/
 
-__pycache__
+messagerie/__pycache__/
+ChatApp/__pycache__/
+messagerie/migrations/
 
 # Ignorer les fichiers temporaires ou système
 *.log
