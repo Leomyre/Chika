@@ -83,12 +83,24 @@ WSGI_APPLICATION = 'ChatApp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
+#}
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',  # Utilisation du backend PostgreSQL
+        'NAME': 'chika',  # Nom de la base de données
+        'USER': 'root',  # Nom d'utilisateur de la base de données
+        'PASSWORD': 's9hKq9FpXdecuFY4B4y8qqo4Q2HkRc1b',  # Mot de passe
+        'HOST': 'dpg-ct2ra1btq21c73b6tt1g-a',  # Hôte de la base de données (vérifie dans Render)
+        'PORT': '5432',  # Port par défaut de PostgreSQL
     }
 }
+
 
 
 # Password validation
