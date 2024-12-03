@@ -19,7 +19,8 @@ def encrypt_message(plain_text, password):
         iterations=100000,
         backend=default_backend()
     )
-    key = kdf.derive(password.encode())
+    key = kdf.derive(password.encode())  # Utilisation du password pour dériver la clé
+    print(f"Derived key for encryption: {key}")
 
     # Chiffrement
     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
@@ -29,11 +30,12 @@ def encrypt_message(plain_text, password):
     padder = padding.PKCS7(algorithms.AES.block_size).padder()
     padded_data = padder.update(plain_text.encode()) + padder.finalize()
 
-    # Chiffrement des données
     encrypted_message = encryptor.update(padded_data) + encryptor.finalize()
 
-    # Retourner le message chiffré avec le sel et l'IV encodés en Base64
-    return f"{base64.b64encode(salt).decode()}:{base64.b64encode(iv).decode()}:{base64.b64encode(encrypted_message).decode()}"
+    encrypted_content = f"{base64.b64encode(salt).decode()}:{base64.b64encode(iv).decode()}:{base64.b64encode(encrypted_message).decode()}"
+    print(f"Encrypted content: {encrypted_content}")
+    return encrypted_content
+
 
 def decrypt_message(encrypted_text, password):
     try:
@@ -47,7 +49,7 @@ def decrypt_message(encrypted_text, password):
         print(f"IV: {iv} (len: {len(iv)})")
         print(f"Encrypted Message: {encrypted_message} (len: {len(encrypted_message)})")
 
-        # Clé dérivée
+        # Dérivation de la clé à partir du password
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
@@ -55,23 +57,28 @@ def decrypt_message(encrypted_text, password):
             iterations=100000,
             backend=default_backend()
         )
-        key = kdf.derive(password.encode())
+        key = kdf.derive(password.encode())  # Utilisation du password pour dériver la clé
+        print(f"Derived key for decryption: {key}")
 
-        # Déchiffrement
         cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
         decryptor = cipher.decryptor()
 
         # Déchiffrement des données
         decrypted_padded_data = decryptor.update(encrypted_message) + decryptor.finalize()
 
+        print(f"Decrypted padded data: {decrypted_padded_data}")
+
         # Retrait du padding
         unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
         decrypted_data = unpadder.update(decrypted_padded_data) + unpadder.finalize()
+
+        print(f"Decrypted data: {decrypted_data}")
         return decrypted_data.decode('utf-8')
 
     except Exception as e:
         print(f"Failed to decrypt: {e}")
         raise
+
 
 
 def check_encryption_consistency(plain_text, encrypted_text, password):

@@ -35,17 +35,17 @@ def conversation(request, user_id):
     # Récupérer les messages envoyés et reçus, triés par date directement en base de données
     messages_list = Message.objects.filter(
         Q(sender=request.user, receiver=receiver) | Q(sender=receiver, receiver=request.user)
-    ).order_by('timestamp')  # Tri par date de manière optimisée via la base de données
+    ).order_by('timestamp')
 
     if request.method == 'POST':
         plain_text_message = request.POST['message']  # Message saisi par l'utilisateur
-        password = receiver.username  # Utiliser le nom d'utilisateur du destinataire comme clé de chiffrement
+        key = request.user.profile.token  # Utiliser le token de l'expéditeur comme clé de chiffrement
 
         # Chiffrement du message
-        encrypted_content = encrypt_message(plain_text_message, request.user.username)
+        encrypted_content = encrypt_message(plain_text_message, key)
 
         # Sauvegarde du message chiffré dans la base de données
-        Message.objects.create(sender=request.user, receiver=receiver, encrypted_content=encrypted_content)
+        Message.objects.create(sender=request.user, receiver=receiver, encrypted_content=encrypted_content, key=key)
         messages.success(request, 'Message envoyé avec succès!')  # Message de succès
         return redirect('conversation', user_id=user_id)  # Rediriger vers la même conversation après l'envoi
 
@@ -53,8 +53,8 @@ def conversation(request, user_id):
     decrypted_messages = []
     for message in messages_list:
         try:
-            # Décryptage du contenu du message
-            decrypted_content = decrypt_message(message.encrypted_content, message.sender.username)
+            # Décryptage du contenu du message en utilisant la clé hachée du message
+            decrypted_content = decrypt_message(message.encrypted_content, message.key)
             decrypted_messages.append({
                 'sender': message.sender.username,
                 'content': decrypted_content,
@@ -66,13 +66,12 @@ def conversation(request, user_id):
                 'content': "Erreur lors du déchiffrement.",
                 'timestamp': message.timestamp
             })
+            print(e)
 
     return render(request, 'messagerie/conversation.html', {
         'receiver': receiver,
         'messages': decrypted_messages,
     })
-
-
 
 
 @login_required
@@ -198,6 +197,14 @@ def manage_account(request):
 
     return render(request, 'messagerie/manage_account.html', {'user': request.user})
 
+
+def actu(request):
+    actu ={
+        'txt':(
+            'Ici les evenements'
+        )
+    }
+    return render(request,'evenement/actuevent.html', actu)
 
 def about(request):
     # Informations dynamiques ou fixes pour l'application et les informations de contact
