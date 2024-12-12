@@ -232,7 +232,7 @@ def about(request):
             "**Akari**, l'administrateur de l'application, s'engage à garantir une expérience utilisateur optimale. Si vous avez des questions, "
             "des suggestions ou des retours, n'hésitez pas à le contacter directement.\n\n"
             "- **Nom** : Akari\n"
-            "- **Email** : [ghleomyre@gmail.com](mailto:ghleomyre@gmail.com)\n\n"
+            "- **Email** : ghleomyre@gmail.com\n\n"
             "Akari est disponible pour :\n"
             "- Vous aider à résoudre vos problèmes techniques.\n"
             "- Répondre à vos questions sur l'utilisation de l'application.\n"
