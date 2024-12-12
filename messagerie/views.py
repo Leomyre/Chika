@@ -216,27 +216,29 @@ def about(request):
     # Informations dynamiques ou fixes pour l'application et les informations de contact
     context = {
         'app_description': (
-            "Bienvenue sur **Chika**, votre application de messagerie sécurisée et intuitive. Avec Chika, échangez "
-            "des messages cryptés de bout en bout en toute confidentialité. Notre mission est de protéger vos données "
-            "et de garantir la sécurité de vos conversations.\n\n"
+            "Bienvenue sur **Chika**, une application de messagerie moderne, sécurisée et intuitive. Conçue pour offrir "
+            "la meilleure expérience utilisateur, Chika met l'accent sur la confidentialité et la simplicité.\n\n"
             "### Fonctionnalités principales :\n"
-            "- **Messages sécurisés** : Chaque message est chiffré avant d'être envoyé, offrant une confidentialité totale.\n"
-            "- **Gestion complète** : Supprimez facilement des conversations ou des messages spécifiques pour garder une boîte "
-            "de réception bien organisée.\n"
-            "- **Personnalisation du profil** : Changez votre pseudo, mettez à jour votre mot de passe ou ajoutez une photo "
-            "de profil pour rendre votre expérience plus personnelle.\n"
-            "- **Interface intuitive** : Une expérience utilisateur simple et fluide, conçue pour tout le monde.\n\n"
-            "Chika met l'accent sur une utilisation facile, une sécurité robuste, et une gestion pratique de vos données personnelles. "
-            "Notre objectif est de vous offrir une messagerie moderne et fiable qui respecte votre vie privée.\n\n"
-            "Rejoignez-nous et découvrez une nouvelle façon de communiquer en toute sérénité."
+            "- **Messagerie cryptée** : Tous les messages sont chiffrés de bout en bout pour garantir une confidentialité totale.\n"
+            "- **Suppression facile** : Vous pouvez supprimer vos messages ou conversations à tout moment, selon vos besoins.\n"
+            "- **Gestion de profil** : Personnalisez votre expérience en modifiant votre pseudo, votre mot de passe ou votre photo de profil.\n"
+            "- **Interface conviviale** : Une interface intuitive et rapide pour une navigation fluide.\n"
+            "- **Mode sombre** : Alternez entre un thème clair et sombre pour un meilleur confort visuel.\n\n"
+            "Chika a été créée pour simplifier la communication tout en respectant vos données personnelles. Nous croyons en un monde "
+            "où la confidentialité n'est pas un luxe mais une priorité."
         ),
         'contact_info': (
-            "### Contactez-nous\n"
-            "- **Email** : [ghleomyre@gmail.com](mailto:ghleomyre@gmail.com)\n"
-            "- **Support** : Nous sommes disponibles pour répondre à vos questions, recevoir vos suggestions et vous accompagner "
-            "dans votre utilisation de Chika.\n\n"
-            "Vos retours sont essentiels pour nous permettre d'améliorer constamment l'application. N'hésitez pas à nous contacter, "
-            "nous sommes là pour vous !"
+            "### À propos de l'administrateur\n"
+            "**Akari**, l'administrateur de l'application, s'engage à garantir une expérience utilisateur optimale. Si vous avez des questions, "
+            "des suggestions ou des retours, n'hésitez pas à le contacter directement.\n\n"
+            "- **Nom** : Akari\n"
+            "- **Email** : [ghleomyre@gmail.com](mailto:ghleomyre@gmail.com)\n\n"
+            "Akari est disponible pour :\n"
+            "- Vous aider à résoudre vos problèmes techniques.\n"
+            "- Répondre à vos questions sur l'utilisation de l'application.\n"
+            "- Recevoir vos suggestions pour améliorer Chika.\n\n"
+            "Nous travaillons en permanence pour améliorer Chika et nous sommes ravis de recevoir vos retours !"
         ),
     }
     return render(request, 'messagerie/about.html', context)
+
