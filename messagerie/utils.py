@@ -45,11 +45,7 @@ def decrypt_message(encrypted_text, password):
         iv = base64.b64decode(iv_base64)
         encrypted_message = base64.b64decode(encrypted_message_base64)
 
-        print(f"Salt: {salt} (len: {len(salt)})")
-        print(f"IV: {iv} (len: {len(iv)})")
-        print(f"Encrypted Message: {encrypted_message} (len: {len(encrypted_message)})")
-
-        # Dérivation de la clé à partir du password
+        # Dérivation de la clé
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
@@ -57,35 +53,38 @@ def decrypt_message(encrypted_text, password):
             iterations=100000,
             backend=default_backend()
         )
-        key = kdf.derive(password.encode())  # Utilisation du password pour dériver la clé
-        print(f"Derived key for decryption: {key}")
+        key = kdf.derive(password.encode())
 
+        # Déchiffrement
         cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
         decryptor = cipher.decryptor()
-
-        # Déchiffrement des données
         decrypted_padded_data = decryptor.update(encrypted_message) + decryptor.finalize()
-
-        print(f"Decrypted padded data: {decrypted_padded_data}")
 
         # Retrait du padding
         unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
         decrypted_data = unpadder.update(decrypted_padded_data) + unpadder.finalize()
 
-        print(f"Decrypted data: {decrypted_data}")
         return decrypted_data.decode('utf-8')
 
+    except ValueError as e:
+        print("Erreur de décryptage - Valeur incorrecte : ", e)
+        raise ValueError("Décryptage échoué : clé ou données incorrectes.")
     except Exception as e:
-        print(f"Failed to decrypt: {e}")
-        raise
+        print("Erreur inattendue lors du décryptage : ", e)
+        raise ValueError("Décryptage échoué en raison d'une erreur inconnue.")
 
 
 
-def check_encryption_consistency(plain_text, encrypted_text, password):
-    encrypted = encrypt_message(plain_text, password)
-    print(f"Encrypted (for check): {encrypted}")
-    
-    decrypted = decrypt_message(encrypted_text, password)
-    print(f"Decrypted (for check): {decrypted}")
-    
-    return decrypted == plain_text
+if __name__ == "__main__":
+    message = "Bonjour, ceci est un test de chiffrement!"
+    password = "mon_secret"
+
+    # Chiffrement
+    encrypted = encrypt_message(message, password)
+    print(f"Message chiffré : {encrypted}")
+
+    # Déchiffrement
+    decrypted = decrypt_message(encrypted, password)
+    print(f"Message déchiffré : {decrypted}")
+
+    assert message == decrypted, "Le message original et déchiffré ne correspondent pas !"

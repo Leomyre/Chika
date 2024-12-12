@@ -32,41 +32,41 @@ def inbox(request):
 def conversation(request, user_id):
     receiver = get_object_or_404(User, id=user_id)
 
-    # Récupérer les messages envoyés et reçus, triés par date directement en base de données
+    # Assurez-vous que l'utilisateur connecté a un profil
+    if not hasattr(request.user, 'profile'):
+        UserProfile.objects.create(user=request.user)
+
+    # Récupération et traitement des messages
     messages_list = Message.objects.filter(
         Q(sender=request.user, receiver=receiver) | Q(sender=receiver, receiver=request.user)
     ).order_by('timestamp')
 
     if request.method == 'POST':
-        plain_text_message = request.POST['message']  # Message saisi par l'utilisateur
+        plain_text_message = request.POST['message']
         key = request.user.profile.token  # Utiliser le token de l'expéditeur comme clé de chiffrement
 
-        # Chiffrement du message
+        # Chiffrement et sauvegarde du message
         encrypted_content = encrypt_message(plain_text_message, key)
-
-        # Sauvegarde du message chiffré dans la base de données
         Message.objects.create(sender=request.user, receiver=receiver, encrypted_content=encrypted_content, key=key)
-        messages.success(request, 'Message envoyé avec succès!')  # Message de succès
-        return redirect('conversation', user_id=user_id)  # Rediriger vers la même conversation après l'envoi
+        messages.success(request, 'Message envoyé avec succès!')
+        return redirect('conversation', user_id=user_id)
 
     # Décryptage des messages
     decrypted_messages = []
     for message in messages_list:
         try:
-            # Décryptage du contenu du message en utilisant la clé hachée du message
             decrypted_content = decrypt_message(message.encrypted_content, message.key)
             decrypted_messages.append({
                 'sender': message.sender.username,
                 'content': decrypted_content,
                 'timestamp': message.timestamp
             })
-        except Exception as e:
+        except Exception:
             decrypted_messages.append({
                 'sender': message.sender.username,
-                'content': "Erreur lors du déchiffrement.",
+                'content': "[Message illisible]",
                 'timestamp': message.timestamp
             })
-            print(e)
 
     return render(request, 'messagerie/conversation.html', {
         'receiver': receiver,
@@ -74,25 +74,39 @@ def conversation(request, user_id):
     })
 
 
+
 @login_required
 def send_message(request):
     users = User.objects.exclude(id=request.user.id)
 
+    # Assurez-vous que l'utilisateur connecté a un profil
+    if not hasattr(request.user, 'profile'):
+        UserProfile.objects.create(user=request.user)
+
     if request.method == 'POST':
         receiver_id = request.POST.get('receiver')
         message_content = request.POST.get('message')
+        key = request.user.profile.token  # Utiliser le token de l'utilisateur comme clé de chiffrement
 
         if receiver_id and message_content:
             receiver = get_object_or_404(User, id=receiver_id)
-            encrypted_content = encrypt_message(message_content, request.user.username)
+            encrypted_content = encrypt_message(message_content, key)
 
-            Message.objects.create(sender=request.user, receiver=receiver, encrypted_content=encrypted_content)
+            # Créez le message avec le contenu chiffré
+            Message.objects.create(
+                sender=request.user,
+                receiver=receiver,
+                encrypted_content=encrypted_content,
+                key=key
+            )
             messages.success(request, f'Message envoyé à {receiver.username}!')
             return redirect('conversation', user_id=receiver.id)
 
+        # Message d'erreur si le formulaire est incomplet
         messages.error(request, 'Veuillez sélectionner un destinataire et écrire un message.')
 
     return render(request, 'messagerie/send_message.html', {'users': users})
+
 
 
 @login_required
@@ -197,36 +211,32 @@ def manage_account(request):
 
     return render(request, 'messagerie/manage_account.html', {'user': request.user})
 
-
-def actu(request):
-    actu ={
-        'txt':(
-            'Ici les evenements'
-        )
-    }
-    return render(request,'evenement/actuevent.html', actu)
-
+@login_required
 def about(request):
     # Informations dynamiques ou fixes pour l'application et les informations de contact
     context = {
         'app_description': (
-            "Chika est une application de messagerie sécurisée qui vous permet d'échanger des messages cryptés "
-            "de bout en bout. Chaque message envoyé est chiffré avant d'être transmis, garantissant ainsi la "
-            "confidentialité totale de vos conversations.\n\n"
-            "L'application offre une gestion complète de vos messages : vous pouvez facilement supprimer des "
-            "conversations ainsi que les messages qu'elles contiennent. Si vous souhaitez garder votre boîte de "
-            "réception propre et organisée, cette fonctionnalité vous offre une flexibilité maximale.\n\n"
-            "En plus de la messagerie, vous avez la possibilité de gérer votre profil utilisateur. Vous pouvez "
-            "mettre à jour votre pseudo, changer votre mot de passe pour plus de sécurité, et modifier votre photo "
-            "de profil pour personnaliser votre expérience. Chika place l'accent sur la simplicité d'utilisation et "
-            "la sécurité de vos données personnelles.\n\n"
-            "Nous nous engageons à offrir une expérience utilisateur fluide, intuitive et hautement sécurisée."
+            "Bienvenue sur **Chika**, votre application de messagerie sécurisée et intuitive. Avec Chika, échangez "
+            "des messages cryptés de bout en bout en toute confidentialité. Notre mission est de protéger vos données "
+            "et de garantir la sécurité de vos conversations.\n\n"
+            "### Fonctionnalités principales :\n"
+            "- **Messages sécurisés** : Chaque message est chiffré avant d'être envoyé, offrant une confidentialité totale.\n"
+            "- **Gestion complète** : Supprimez facilement des conversations ou des messages spécifiques pour garder une boîte "
+            "de réception bien organisée.\n"
+            "- **Personnalisation du profil** : Changez votre pseudo, mettez à jour votre mot de passe ou ajoutez une photo "
+            "de profil pour rendre votre expérience plus personnelle.\n"
+            "- **Interface intuitive** : Une expérience utilisateur simple et fluide, conçue pour tout le monde.\n\n"
+            "Chika met l'accent sur une utilisation facile, une sécurité robuste, et une gestion pratique de vos données personnelles. "
+            "Notre objectif est de vous offrir une messagerie moderne et fiable qui respecte votre vie privée.\n\n"
+            "Rejoignez-nous et découvrez une nouvelle façon de communiquer en toute sérénité."
         ),
         'contact_info': (
-            "Si vous avez des questions, des suggestions ou souhaitez simplement nous contacter, vous pouvez nous "
-            "envoyer un email à : ghleomyre@gmail.com\n\n"
-            "Nous serons heureux de recevoir vos retours et d'améliorer constamment l'application pour mieux "
-            "répondre à vos besoins."
+            "### Contactez-nous\n"
+            "- **Email** : [ghleomyre@gmail.com](mailto:ghleomyre@gmail.com)\n"
+            "- **Support** : Nous sommes disponibles pour répondre à vos questions, recevoir vos suggestions et vous accompagner "
+            "dans votre utilisation de Chika.\n\n"
+            "Vos retours sont essentiels pour nous permettre d'améliorer constamment l'application. N'hésitez pas à nous contacter, "
+            "nous sommes là pour vous !"
         ),
     }
     return render(request, 'messagerie/about.html', context)

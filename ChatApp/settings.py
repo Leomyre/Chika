@@ -94,10 +94,10 @@ WSGI_APPLICATION = 'ChatApp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',  # Utilisation du backend PostgreSQL
-        'NAME': 'chika',  # Nom de la base de données
+        'NAME': 'chika_4mp6',  # Nom de la base de données
         'USER': 'root',  # Nom d'utilisateur de la base de données
-        'PASSWORD': 's9hKq9FpXdecuFY4B4y8qqo4Q2HkRc1b',  # Mot de passe
-        'HOST': 'dpg-ct2ra1btq21c73b6tt1g-a.oregon-postgres.render.com',  # Hôte de la base de données (vérifie dans Render)
+        'PASSWORD': 'SI31WKlpWGqzIrNNrsdvOeXOlwI6xDtc',  # Mot de passe
+        'HOST': 'dpg-ctd7gce8ii6s738vm7a0-a.oregon-postgres.render.com',  # Hôte de la base de données (vérifie dans Render)
         'PORT': '5432',  # Port par défaut de PostgreSQL
     }
 }

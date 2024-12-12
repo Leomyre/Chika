@@ -134,6 +134,7 @@
             <nav class="md:mt-8">
                 <ul class="flex md:flex-col space-x-4 md:space-x-0 md:space-y-2 p-4 md:p-0">
                     {% if user.is_authenticated %}
+
                         <li><a href="{% url 'inbox' %}" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Messages</a></li>
                         <li><a href="{% url 'manage_account' %}" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Profil</a></li>
                         <li><a href="{% url 'about' %}" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">A propos</a></li> <!-- Nouveau lien -->

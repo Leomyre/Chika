@@ -41,5 +41,5 @@ def create_user_profile(sender, instance, created, **kwargs):
 # Signal pour sauvegarder le profil après une mise à jour de l'utilisateur
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
-    if hasattr(instance, 'profile'):
-        instance.profile.save()
+    if hasattr(instance, 'userprofile'):
+        instance.userprofile.save()
