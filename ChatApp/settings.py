@@ -30,7 +30,7 @@ SECRET_KEY = 'Chika-ChatespaceWithespaceFrinedpoint'
 DEBUG = False
 
 #ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['"https://chika-chat.onrender.com"']
+ALLOWED_HOSTS = ['chika-chat.onrender.com','https://chika-chat.onrender.com']
 
 
 LOGIN_URL = 'login'
