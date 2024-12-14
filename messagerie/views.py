@@ -206,6 +206,7 @@ def manage_account(request):
         user = request.user
         if username:
             user.username = username
+            user.profile.save()
         # Si vous souhaitez permettre la modification de l'email, décommentez et utilisez la ligne ci-dessous :
         # if email:
         #    user.email = email
