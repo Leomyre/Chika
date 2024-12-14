@@ -7,11 +7,12 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="max-w-2xl mx-auto bg-white rounded-lg shadow p-6 space-y-6">
     <h3 class="text-xl font-semibold text-gray-700 ">Description de l'application</h3>
-    <p class="text-sm font-medium text-gray-700 ">{{ app_description }}</p>
+    <p class="text-sm font-medium text-gray-700 ">{{ app_description |safe}}</p>
 
     <h3 class="text-xl font-semibold mt-4 text-gray-700 ">Informations de contact</h3>
-    <p class="text-sm font-medium text-gray-700 ">{{ contact_info }}</p>
+    <p class="text-sm font-medium text-gray-700  ">{{ contact_info |safe }}</p>
 </div>
 {% endblock %}
