@@ -32,14 +32,26 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
 
-# Signal pour créer un profil utilisateur si nécessaire
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
+    else:
+        # Crée un profil si l'utilisateur n'en a pas
+        if not hasattr(instance, 'profile'):
+            UserProfile.objects.create(user=instance)
+
 
 # Signal pour sauvegarder le profil après une mise à jour de l'utilisateur
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     if hasattr(instance, 'userprofile'):
         instance.userprofile.save()
+
+
+class AboutInfo(models.Model):
+    app_description = models.TextField()
+    contact_info = models.TextField()
+
+    def __str__(self):
+        return "Informations sur l'application"

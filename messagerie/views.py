@@ -10,7 +10,7 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.db.models import Q
-from .models import UserProfile
+from .models import UserProfile,AboutInfo
 
 @login_required
 def inbox(request):
@@ -57,12 +57,14 @@ def conversation(request, user_id):
         try:
             decrypted_content = decrypt_message(message.encrypted_content, message.key)
             decrypted_messages.append({
+                'id': message.id,
                 'sender': message.sender.username,
                 'content': decrypted_content,
                 'timestamp': message.timestamp
             })
         except Exception:
             decrypted_messages.append({
+                'id': message.id,
                 'sender': message.sender.username,
                 'content': "[Message illisible]",
                 'timestamp': message.timestamp
@@ -106,6 +108,25 @@ def send_message(request):
         messages.error(request, 'Veuillez sélectionner un destinataire et écrire un message.')
 
     return render(request, 'messagerie/send_message.html', {'users': users})
+
+@login_required
+def delete_message(request, message_id):
+    # Vérifiez que l'utilisateur est connecté
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    # Récupérer le message ou retourner une erreur 404
+    message = get_object_or_404(Message, id=message_id)
+
+    # Vérifiez que l'utilisateur est le propriétaire du message
+    if message.sender != request.user:
+        return redirect('inbox')
+
+    # Supprimez le message
+    message.delete()
+
+    # Redirigez vers la boîte de réception
+    return redirect('inbox')
 
 
 
@@ -204,6 +225,7 @@ def manage_account(request):
             fs = FileSystemStorage(location='media/profile_photos')
             filename = fs.save(photo.name, photo)
             user.profile.photo = f"profile_photos/{filename}"
+            user.profile.save()
 
         user.save()  # Sauvegarder l'utilisateur avec les nouvelles informations
         messages.success(request, "Profil mis à jour avec succès.")
@@ -211,34 +233,12 @@ def manage_account(request):
 
     return render(request, 'messagerie/manage_account.html', {'user': request.user})
 
-@login_required
 def about(request):
-    # Informations dynamiques ou fixes pour l'application et les informations de contact
+    # Récupérer les informations depuis la base de données
+    about_info = AboutInfo.objects.first()  # Assurez-vous qu'il y a toujours une entrée dans la table
+
     context = {
-        'app_description': (
-            "Bienvenue sur **Chika**, une application de messagerie moderne, sécurisée et intuitive. Conçue pour offrir "
-            "la meilleure expérience utilisateur, Chika met l'accent sur la confidentialité et la simplicité.\n\n"
-            "### Fonctionnalités principales :\n"
-            "- **Messagerie cryptée** : Tous les messages sont chiffrés de bout en bout pour garantir une confidentialité totale.\n"
-            "- **Suppression facile** : Vous pouvez supprimer vos messages ou conversations à tout moment, selon vos besoins.\n"
-            "- **Gestion de profil** : Personnalisez votre expérience en modifiant votre pseudo, votre mot de passe ou votre photo de profil.\n"
-            "- **Interface conviviale** : Une interface intuitive et rapide pour une navigation fluide.\n"
-            "- **Mode sombre** : Alternez entre un thème clair et sombre pour un meilleur confort visuel.\n\n"
-            "Chika a été créée pour simplifier la communication tout en respectant vos données personnelles. Nous croyons en un monde "
-            "où la confidentialité n'est pas un luxe mais une priorité."
-        ),
-        'contact_info': (
-            "### À propos de l'administrateur\n"
-            "**Akari**, l'administrateur de l'application, s'engage à garantir une expérience utilisateur optimale. Si vous avez des questions, "
-            "des suggestions ou des retours, n'hésitez pas à le contacter directement.\n\n"
-            "- **Nom** : Akari\n"
-            "- **Email** : ghleomyre@gmail.com\n\n"
-            "Akari est disponible pour :\n"
-            "- Vous aider à résoudre vos problèmes techniques.\n"
-            "- Répondre à vos questions sur l'utilisation de l'application.\n"
-            "- Recevoir vos suggestions pour améliorer Chika.\n\n"
-            "Nous travaillons en permanence pour améliorer Chika et nous sommes ravis de recevoir vos retours !"
-        ),
+        'app_description': about_info.app_description if about_info else 'Description de l\'application non définie.',
+        'contact_info': about_info.contact_info if about_info else 'Informations de contact non définies.',
     }
     return render(request, 'messagerie/about.html', context)
-

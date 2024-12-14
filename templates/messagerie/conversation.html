@@ -20,12 +20,22 @@
 </div>
 {% endblock %}
 
+{% if messages %}
+    <div class="my-4">
+        {% for message in messages %}
+            <div class="p-4 rounded {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 {% block content %}
 <div class="flex flex-col h-full bg-gray-100 transition-colors duration-200">
     <div class="flex-1 overflow-y-auto mb-4 p-4">
         <ul class="space-y-4">
             {% for message in messages %}
-                <li class="flex {% if message.sender == request.user.username %}justify-end{% else %}justify-start{% endif %}">
+                <li class="flex {% if message.sender == request.user.username %}justify-end{% else %}justify-start{% endif %}" id="message-{{ message.id }}">
                     <div class="flex items-start">
                         <!-- Pour l'expéditeur (l'utilisateur connecté), afficher le bouton (3 points) avant le message et la photo après -->
                         {% if message.sender == request.user.username %}
@@ -38,7 +48,7 @@
                             
                             <!-- Contenu du message -->
                             <div class="max-w-xs sm:max-w-md lg:max-w-lg xl:max-w-xl px-4 py-2 rounded-lg {% if message.sender == request.user.username %}bg-blue-500 text-white{% else %}bg-white text-gray-800{% endif %} shadow">
-                                <p class="text-sm">{{ message.content }}</p>
+                                <p class="text-sm message-content">{{ message.content }}</p>
                                 <p class="text-xs {% if message.sender == request.user.username %}text-blue-100{% else %}text-gray-500{% endif %} mt-1">{{ message.timestamp|date:"H:i" }}</p>
                             </div>
 
@@ -63,7 +73,7 @@
                             
                             <!-- Contenu du message -->
                             <div class="max-w-xs sm:max-w-md lg:max-w-lg xl:max-w-xl px-4 py-2 rounded-lg {% if message.sender == request.user.username %}bg-blue-500 text-white{% else %}bg-white text-gray-800{% endif %} shadow">
-                                <p class="text-sm">{{ message.content }}</p>
+                                <p class="text-sm message-content">{{ message.content }}</p>
                                 <p class="text-xs {% if message.sender == request.user.username %}text-blue-100{% else %}text-gray-500{% endif %} mt-1">{{ message.timestamp|date:"H:i" }}</p>
                             </div>
 
@@ -110,23 +120,34 @@
         menu.style.left = `${event.clientX}px`;
         menu.style.top = `${event.clientY}px`;
         currentMessageId = messageId;
+        console.log("Message ID :", messageId);
     }
 
     function deleteMessage() {
         if (confirm("Voulez-vous vraiment supprimer ce message ?")) {
             window.location.href = `/message/delete/${currentMessageId}/`;
+            console.log("Message ID :", currentMessageId);
         }
     }
 
     function replyToMessage() {
         const textarea = document.querySelector('textarea[name="message"]');
-        textarea.value = `Réponse au message ${currentMessageId}: `;
-        textarea.focus();
+
+        // Trouver le message correspondant à l'ID actuel
+        const message = document.querySelector(`#message-${currentMessageId}`);
+        if (message) {
+            const messageContent = message.querySelector('.message-content').innerText;  // Utilisez la bonne classe ici
+            textarea.value = `Répondre à: ${messageContent}`;
+            textarea.focus();
+            console.log("Message :", messageContent);
+        } else {
+            console.log("Message non trouvé !");
+        }
     }
 
     document.addEventListener('click', function(event) {
         const menu = document.getElementById('message-actions-menu');
-        if (!menu.contains(event.target) && !event.target.closest('button')) {
+        if (menu.style.display === 'block' && !menu.contains(event.target)) {
             menu.style.display = 'none';
         }
     });
