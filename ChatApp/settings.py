@@ -90,15 +90,18 @@ WSGI_APPLICATION = 'ChatApp.wsgi.application'
 #        'NAME': BASE_DIR / 'db.sqlite3',
 #    }
 #}
+import environ
+env = environ.Env()
+environ.Env.read_env()
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',  # Utilisation du backend PostgreSQL
-        'NAME': 'chika_4mp6',  # Nom de la base de données
-        'USER': 'root',  # Nom d'utilisateur de la base de données
-        'PASSWORD': 'SI31WKlpWGqzIrNNrsdvOeXOlwI6xDtc',  # Mot de passe
-        'HOST': 'dpg-ctd7gce8ii6s738vm7a0-a.oregon-postgres.render.com',  # Hôte de la base de données (vérifie dans Render)
-        'PORT': '5432',  # Port par défaut de PostgreSQL
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('DB_NAME'),
+        'USER': env('DB_USER'),
+        'PASSWORD': env('DB_PASSWORD'),
+        'HOST': env('DB_HOST'),
+        'PORT': env('DB_PORT', default='5432'),
     }
 }
 
