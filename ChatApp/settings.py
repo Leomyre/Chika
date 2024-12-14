@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-@ao%wx&+t-k$zsjc$4&*ofju9yzv=l$od6be1wime=_7s%fc)0
 DEBUG = False
 
 #ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['chika-gjfv.onrender.com']
+ALLOWED_HOSTS = ['"https://chika-chat.onrender.com"']
 
 
 LOGIN_URL = 'login'
